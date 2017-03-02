@@ -16,3 +16,14 @@ def chunks(l, n):
 
 def mean(a):
     return sum(a) / len(a)
+
+
+class TestDataset(object):
+    def __init__(self):
+        pass
+    
+    def get_batch(self, batch_size):
+        data = np.ones((batch_size, 16, 16, 16, 1)) * 0.001
+        labels = np.ones((batch_size, 1))
+
+        return data, labels
