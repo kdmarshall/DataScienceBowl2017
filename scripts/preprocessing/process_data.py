@@ -1,30 +1,39 @@
+"""
+Example: python /Users/Peace/Desktop/data_processor.py /Users/Peace/Desktop/Joshs/stage1 /Users/Peace/Desktop/output_phase1
+"""
+
 import numpy as np # linear algebra
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import dicom
 import os
 import scipy.ndimage as ndimage
 import matplotlib
-matplotlib.use('TkAgg')
+matplotlib.use('TkAgg') # For OSX
 import matplotlib.pyplot as plt
+import argparse
+from multiprocessing import Pool
 
 from skimage import measure, morphology, segmentation
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
-
-def prepare_filepaths(dataset_path):
-    paths = []
-    for root, dirs, files in os.walk(dataset_path):
-        path = root.split('/')
-        for file in files:
-            if '.dcm' == file[-4:]:
-                paths.append(root+'/'+file)
-    return paths
+parser = argparse.ArgumentParser()
+parser.add_argument("input_dir")
+parser.add_argument("output_dir")
+args = parser.parse_args()
 
 # Some constants 
-INPUT_FOLDER = '/Users/Peace/Desktop/Joshs/stage1/'
+INPUT_FOLDER = args.input_dir # stage1 dir
+OUTPUT_DIR = args.output_dir # phase1 dir
 patients = os.listdir(INPUT_FOLDER)
 patients.sort()
 
+patients = [x for x in patients if x[0] != '.'] # DS_STORE
+
+# Create output dirs
+for patient in patients:
+    outdir = os.path.join(OUTPUT_DIR, patient)
+    if not os.path.exists(outdir):
+        os.mkdir(outdir)
 
 
 # Load the scans in given folder path
