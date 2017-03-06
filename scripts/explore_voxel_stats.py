@@ -45,13 +45,16 @@ for patient in patients:
 plt.hist(thickness_vals, bins=60)
 plt.ylabel('Thicknesses')
 plt.savefig(os.path.expanduser('~/Desktop/thick_dist.png'))
+plt.clf()
 
 plt.hist(spacing_vals, bins=60)
 plt.ylabel('Spacing')
 plt.savefig(os.path.expanduser('~/Desktop/space_dist.png'))
+plt.clf()
 
 plt.hist(spacing_diffs, bins=60)
 plt.ylabel('Spacing Diffs')
 plt.savefig(os.path.expanduser('~/Desktop/diffs_dist.png'))
+plt.clf()
 
 
