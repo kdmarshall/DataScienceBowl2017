@@ -1,20 +1,25 @@
 import dicom
 import numpy as np
 import pandas as pd
-from PIL import Image
-import cv2
+import tensorflow as tf
+# from PIL import Image
+# import cv2
+import os
+import math
+
+from utils import *
 
 HM_SLICES = 20
+# IMAGE_WIDTH = 256
+# IMAGE_HEIGHT = 256
+IMAGE_DEPTH = 120
 
 # TODO: TF flags should be changed to args
 tf.app.flags.DEFINE_string("stage1",'','Full training examples set.')
 tf.app.flags.DEFINE_string("samples",'','Sample training examples set.')
 tf.app.flags.DEFINE_string("labels",'','Full training labels set.')
 
-if FLAGS.samples:
-    sample_data = get_sample_data(FLAGS.samples,FLAGS.labels)
-elif FLAGS.stage1:
-    print("No function to handle stage1 data yet.")
+FLAGS = tf.app.flags.FLAGS
 
 def get_sample_data(examples_path,labels_path):
 	# Not yet working!
@@ -32,16 +37,24 @@ def get_sample_data(examples_path,labels_path):
 					for fname in os.listdir(file_path)
 						if fname != '.DS_Store']
 		slices.sort(key=lambda x: int(x.ImagePositionPatient[2]))
-		slices = [cv2.resize(np.array(each_slice.pixel_array),(IMAGE_WIDTH,IMAGE_HEIGHT))
-					for each_slice in slices]
-		new_slices = []
-		chunk_sizes = int(math.ceil(len(slices) / HM_SLICES))
-		print(chunk_sizes)
-		for slice_chunk in chunks(slices,chunk_sizes):
-			slice_chunk = list(map(mean, zip(*slice_chunk)))
-			new_slices.append(slice_chunk)
+		# slices = [np.array(each_slice.pixel_array).astype('uint8')
+		# 			for each_slice in slices]
+		# print(len(slices))
+		start = float(slices[0].SliceLocation)
+		# print("Start {}".format(start))
+		finish = float(slices[-1].SliceLocation)
+		# print("Finish {}".format(finish))
+		depth =  finish - start
+		print("Depth {}".format(abs(depth)))
+		# return
+		# print("**********")
 
-		print(len(slices), len(new_slices))
-		break
+def main(*args):
+	if FLAGS.samples:
+		sample_data = get_sample_data(FLAGS.samples,FLAGS.labels)
+	elif FLAGS.stage1:
+		print("No function to handle stage1 data yet.")
+	# TODO: Save out dataset (h5)
 
-# TODO: Save out dataset (h5)
+if __name__ == "__main__":
+    tf.app.run()
