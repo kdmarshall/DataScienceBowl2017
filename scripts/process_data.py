@@ -37,22 +37,30 @@ for patient in patients:
     if not os.path.exists(outdir):
         os.mkdir(outdir)
 
+for patient in patients:
 
+    patient_scans = load_scan(os.path.join(INPUT_FOLDER, patient))
+    patient_images = get_pixels_hu(patient_scans)
 
-test_patient_scans = load_scan(os.path.join(INPUT_FOLDER, patients[8]))
-test_patient_images = get_pixels_hu(test_patient_scans)
+    old_spacing = [float(patient_scans[0].SliceThickness), float(patient_scans[0].PixelSpacing[0]), float(patient_scans[0].PixelSpacing[1])]
+    print(old_spacing)
 
-print(test_patient_scans[20].SliceThickness)
-print(test_patient_scans[20].PixelSpacing)
+    scans_segmented = []
+    for img in patient_images:
+        segmented, _, _, _, _, _, _, _ = seperate_lungs(img)
+        scans_segmented.append(segmented)
+    scans_segmented = np.array(scans_segmented)
+    scans_segmented[scans_segmented == -2000] = 0
 
+    print(np.max(scans_segmented))
+    print(np.min(scans_segmented))
 
-test_segmented, _, _, _, _, _, _, _ = seperate_lungs(test_patient_images[65])
-test_segmented[test_segmented == -2000] = 0
-print(np.max(test_segmented))
-print(np.min(test_segmented))
+    print(scans_segmented.shape)
 
-resample(image, scan, new_spacing=[1,1,1])
-
+    resampled, new_spacing = resample(scans_segmented, old_spacing, new_spacing=[2.5, 1., 1.])
+    print(resampled.shape)
+    print(new_spacing)
+    break
 sdfsdf
 
 
