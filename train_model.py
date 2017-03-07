@@ -29,7 +29,7 @@ if FLAGS.dataset:
     pass
 else:
     # If no dataset provided, create random data (useful for testing)
-    dataset = TestDataset(sample_path=FLAGS.sample_data)
+    dataset = TestDataset(sample_path=FLAGS.sample_data,label_path=FLAGS.labels)
 
 # TF Placeholders
 # input_placeholder = tf.placeholder(tf.float32,[None, 

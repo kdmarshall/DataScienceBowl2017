@@ -21,9 +21,10 @@ def mean(a):
 
 
 class TestDataset(object):
-    def __init__(self,sample_path=None):
+    def __init__(self,sample_path=None,label_path=None):
         if sample_path:
             self.sample_path = sample_path
+            self.label_path = label_path
             self.samples,self.labels = self._build_sample_set()
     
     def get_batch(self, batch_size):
@@ -38,10 +39,8 @@ class TestDataset(object):
         return self.samples[batch_index], np.array([[self.labels[batch_index]]])
 
     def _build_sample_set(self):
-        examples_path = os.path.join(self.sample_path,'sample_images')
-        labels_path = os.path.join(self.sample_path,'stage1_labels.csv')
-        patients = [fname for fname in os.listdir(examples_path) if fname != '.DS_Store']
-        labels_df = pd.read_csv(labels_path, index_col='id')
+        patients = [fname for fname in os.listdir(self.sample_path) if fname != '.DS_Store']
+        labels_df = pd.read_csv(self.label_path, index_col='id')
         samples = []
         labels = []
         for patient in patients:
@@ -50,7 +49,7 @@ class TestDataset(object):
             except:
                 print("Patient {} not found".format(patient))
                 continue
-            file_path = os.path.join(examples_path,patient)
+            file_path = os.path.join(self.sample_path,patient)
             slices = [dicom.read_file(os.path.join(file_path,fname))
                         for fname in os.listdir(file_path)
                             if fname != '.DS_Store']
