@@ -1,4 +1,5 @@
 import os
+import sys
 
 import tensorflow as tf
 import numpy as np
@@ -8,6 +9,8 @@ from ml_ops import *
 from models import baseline_model as model
 
 tf.app.flags.DEFINE_string("dataset", None, 'Path to dataset h5.')
+tf.app.flags.DEFINE_string("sample_data", None, 'Path to sample data set directory.')
+tf.app.flags.DEFINE_string("labels", None, 'Path to labels data set.')
 
 # Globals
 FLAGS = tf.app.flags.FLAGS
@@ -26,11 +29,21 @@ if FLAGS.dataset:
     pass
 else:
     # If no dataset provided, create random data (useful for testing)
-    dataset = TestDataset()
+    dataset = TestDataset(sample_path=FLAGS.sample_data,label_path=FLAGS.labels)
 
 # TF Placeholders
-input_placeholder = tf.placeholder(tf.float32,[None, IMAGE_DEPTH, IMAGE_HEIGHT,
-                                               IMAGE_WIDTH, 1])
+# input_placeholder = tf.placeholder(tf.float32,[None, 
+#                                                IMAGE_DEPTH,
+#                                                IMAGE_HEIGHT,
+#                                                IMAGE_WIDTH,
+#                                                1])
+
+# Sample data TF Placeholders
+input_placeholder = tf.placeholder(tf.float32,[None, 
+                                               None,
+                                               512,
+                                               512,
+                                               1])
 labels_placeholder = tf.placeholder(tf.float32, [None, 1]) # 1 class: 0 or 1
 #training_placeholder = tf.placeholder(tf.bool)
 learning_rate = tf.Variable(INITIAL_LEARNING_RATE, trainable=False)
@@ -49,7 +62,10 @@ def main(*args):
         tf.global_variables_initializer().run()
         print("Training...")
         for step in range(NUM_STEPS):
-            data_batch, labels_batch = dataset.get_batch(BATCH_SIZE)
+            # data_batch, labels_batch = dataset.get_batch(BATCH_SIZE)
+            data_batch, labels_batch = dataset.get_sample_batch()
+            print(data_batch.shape)
+            sys.exit(0)
             feed_dict = {input_placeholder: data_batch,
                          labels_placeholder: labels_batch,
                           }
