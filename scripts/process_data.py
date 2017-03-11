@@ -9,6 +9,7 @@ import os
 import scipy.ndimage as ndimage
 
 import argparse
+import gzip
 from multiprocessing import Pool
 
 from skimage import measure, morphology, segmentation
@@ -84,6 +85,12 @@ def preprocess(patient):
 
 
     np.save(os.path.join(OUTPUT_DIR, '{}.npy'.format(patient)), trimmed)
+
+
+
+    f = gzip.GzipFile('/Users/Peace/Desktop/test.npy.gz', "w")
+    np.save(file=f, arr=np.rint(trimmed).astype('int16'))
+    f.close()
 
 if __name__ == '__main__':
     p = Pool(8)
