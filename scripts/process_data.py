@@ -13,7 +13,7 @@ import gzip
 from multiprocessing import Pool
 
 from skimage import measure, morphology, segmentation
-from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+#from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 from common import *
 

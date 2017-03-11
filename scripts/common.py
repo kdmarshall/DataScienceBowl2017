@@ -4,12 +4,12 @@ Mostly obtained or derived from Kaggle kernels.
 """
 
 import numpy as np # linear algebra
-import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+#import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import dicom
 import os
 import scipy.ndimage as ndimage
 import argparse
-from multiprocessing import Pool
+#from multiprocessing import Pool
 
 from skimage import measure, morphology, segmentation
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
