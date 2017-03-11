@@ -40,6 +40,11 @@ patients.sort()
 
 patients = [x for x in patients if x[0] != '.'] # DS_STORE
 
+patients.sort()
+
+patients = patients[:500]
+patients = patients[500:]
+
 ## Create output dirs
 #for patient in patients:
 #    outdir = os.path.join(OUTPUT_DIR, patient)
@@ -83,12 +88,9 @@ def preprocess(patient):
 
     trimmed = resampled[bbox[4]:bbox[5], bbox[2]:bbox[3], bbox[0]:bbox[1]]
 
+    #np.save(os.path.join(OUTPUT_DIR, '{}.npy'.format(patient)), trimmed)
 
-    np.save(os.path.join(OUTPUT_DIR, '{}.npy'.format(patient)), trimmed)
-
-
-
-    f = gzip.GzipFile('/Users/Peace/Desktop/test.npy.gz', "w")
+    f = gzip.GzipFile('/mnt/disks/data1/processed/{}.npy.gz'.format(patient), "w")
     np.save(file=f, arr=np.rint(trimmed).astype('int16'))
     f.close()
 
