@@ -42,8 +42,10 @@ patients = [x for x in patients if x[0] != '.'] # DS_STORE
 
 patients.sort()
 
-patients = patients[:500]
-patients = patients[500:]
+print("Num patients: {}".format(len(patients)))
+
+#patients = patients[:500]
+#patients = patients[500:]
 
 ## Create output dirs
 #for patient in patients:
@@ -96,6 +98,7 @@ def preprocess(patient):
 
 if __name__ == '__main__':
     p = Pool(8)
+    print("Processing...")
     p.map(preprocess, patients)
 
 #sdf
