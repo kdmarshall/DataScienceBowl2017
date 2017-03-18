@@ -1,8 +1,7 @@
-import numpy as np
-import dicom
 import os
 import numpy as np
 import pandas as pd
+import random
 
 def get_array_from_dcm(filepath, dtype='uint8'):
     ds = dicom.read_file(filepath)
@@ -39,6 +38,7 @@ class TestDataset(object):
         return self.samples[batch_index], np.array([[self.labels[batch_index]]])
 
     def _build_sample_set(self):
+        import dicom
         patients = [fname for fname in os.listdir(self.sample_path) if fname != '.DS_Store']
         labels_df = pd.read_csv(self.label_path, index_col='id')
         samples = []
@@ -59,3 +59,9 @@ class TestDataset(object):
             samples.append(np.array(slices))
             labels.append(int(label))
         return samples, labels
+
+class Dataset(object):
+    def __init__(self, dir_path, labels_path):
+        pass
+
+
