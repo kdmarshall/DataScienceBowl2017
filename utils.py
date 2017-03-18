@@ -62,6 +62,25 @@ class TestDataset(object):
 
 class Dataset(object):
     def __init__(self, dir_path, labels_path):
-        pass
+    
+        def match_labels():
+            # take patient names and match them with the corresponding labels
+            pass
+
+        labels = []
+        array_paths = []
+        self.patient_nums = len(labels)
+
+    def get_batch():
+        patient_id = random.choice(patient_nums)
+        label = self.labels[patient_id]
+        array_path = self.array_paths[patient_id]
+
+        gzipfile = gzip.GzipFile(os.path.join(root_p, path), 'r')
+        arr = np.load(gzipfile)
+
+        # Check shape
+
+
 
 
