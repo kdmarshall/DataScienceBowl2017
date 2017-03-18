@@ -66,9 +66,18 @@ class Dataset(object):
         def match_labels():
             # take patient names and match them with the corresponding labels
             pass
+        
+        paths = os.listdir(dir_path)
+        patient_paths = [os.path.join(dir_path, x) for x in paths]
+        
+        # We need to match patients with labels
+        self.patients = {}
+        for patient in patient_paths:
+            patient_id = patient.split('/'[-1]).split('.')[0]
+            self.patients[]
 
         labels = []
-        array_paths = []
+
         self.patient_nums = len(labels)
 
     def get_batch():
