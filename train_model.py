@@ -15,8 +15,8 @@ tf.app.flags.DEFINE_string("model", None, 'Directory path to save out model and 
 # Globals
 FLAGS = tf.app.flags.FLAGS
 # Using test sizes for now for faster debugging
-IMAGE_WIDTH = 140
-IMAGE_HEIGHT = 250
+IMAGE_HEIGHT = 140
+IMAGE_WIDTH = 250
 IMAGE_DEPTH = 325
 
 # HP
@@ -34,15 +34,23 @@ else:
     # If no dataset provided, create random data (useful for testing)
     dataset = TestDataset(sample_path=FLAGS.sample_data,label_path=FLAGS.labels)
 
-if FLAGS.model:
-    if not os.path.exists(FLAGS.model):
-        os.makedirs(FLAGS.model)
+if not os.path.exists(FLAGS.model):
+    os.makedirs(FLAGS.model)
+
+if FLAGS.model[-1] == '/':
+    model_name = FLAGS.model[:-1].split('/')[-1]
+    model_path = os.path.join(FLAGS.model, model_name+'.ckpt')
+else:
+    model_name = FLAGS.model.split('/')[-1]
+    model_path = os.path.join(FLAGS.model, model_name+'.ckpt')
+
+saver = tf.train.Saver()
 
 # TF Placeholders
-input_placeholder = tf.placeholder(tf.float32,[None, 
-                                               IMAGE_DEPTH,
+input_placeholder = tf.placeholder(tf.float32,[None,
                                                IMAGE_HEIGHT,
                                                IMAGE_WIDTH,
+                                               IMAGE_DEPTH,
                                                1])
 
 # Sample data TF Placeholders
@@ -71,7 +79,11 @@ def main(*args):
             patient, label_batch, data_batch = dataset.get_batch()
             print("Data Shape:")
             print(data_batch.shape)
-            sys.exit(0)
+            data_batch = data_batch.reshape([1,
+                                             IMAGE_HEIGHT,
+                                             IMAGE_WIDTH,
+                                             IMAGE_DEPTH,
+                                             1])
             feed_dict = {input_placeholder: data_batch,
                          labels_placeholder: label_batch,
                           }
@@ -88,6 +100,7 @@ def main(*args):
                             }
                 valid_l, output = sess.run([loss, logits],
                                             feed_dict=feed_dict)
+                saver.save(sess, model_path, step)
                 print("Validation loss {}".format(l))
                 print(list(np.squeeze(output)))
 
