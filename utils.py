@@ -2,6 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import random
+import gzip
 
 def get_array_from_dcm(filepath, dtype='uint8'):
     ds = dicom.read_file(filepath)
@@ -66,30 +67,32 @@ class Dataset(object):
         def match_labels():
             # take patient names and match them with the corresponding labels
             pass
-        
+        self.sample_dir_path = dir_path
         paths = os.listdir(dir_path)
         patient_paths = [os.path.join(dir_path, x) for x in paths]
-        
+        labels_df = pd.read_csv(labels_path, index_col='id')
         # We need to match patients with labels
         self.patients = {}
+        patients_not_found = []
         for patient in patient_paths:
-            patient_id = patient.split('/'[-1]).split('.')[0]
-            self.patients[]
+            patient_id = patient.split('/')[-1].split('.')[0]
+            try:
+                label = labels_df.get_value(str(patient_id), 'cancer')
+            except:
+                # print("Patient {} not found".format(patient_id))
+                patients_not_found.append(patient_id)
+                continue
+            self.patients[patient_id] = int(label)
+        # print("Did not find {} out of {} total patients".format(len(patients_not_found),len(patient_paths)))
 
-        labels = []
+        self.patient_nums = len(self.patients)
 
-        self.patient_nums = len(labels)
-
-    def get_batch():
-        patient_id = random.choice(patient_nums)
-        label = self.labels[patient_id]
-        array_path = self.array_paths[patient_id]
-
-        gzipfile = gzip.GzipFile(os.path.join(root_p, path), 'r')
-        arr = np.load(gzipfile)
-
+    def get_batch(self):
+        patient = random.choice(list(self.patients.keys()))
+        label = self.patients[patient]
+        gz_file_path = os.path.join(self.sample_dir_path,patient + '.npy.gz')
+        gzipfile = gzip.GzipFile(gz_file_path, 'r')
+        sample_arr = np.load(gzipfile)
+        label_arr = np.array(label).reshape([-1,1])
         # Check shape
-
-
-
-
+        return patient, label_arr, sample_arr

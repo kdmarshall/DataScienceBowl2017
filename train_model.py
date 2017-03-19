@@ -25,25 +25,24 @@ INITIAL_LEARNING_RATE = 1e-3
 NUM_STEPS = 100
 
 if FLAGS.dataset:
-    # TODO
-    pass
+    dataset = Dataset(FLAGS.dataset,FLAGS.labels)
 else:
     # If no dataset provided, create random data (useful for testing)
     dataset = TestDataset(sample_path=FLAGS.sample_data,label_path=FLAGS.labels)
 
 # TF Placeholders
-# input_placeholder = tf.placeholder(tf.float32,[None, 
-#                                                IMAGE_DEPTH,
-#                                                IMAGE_HEIGHT,
-#                                                IMAGE_WIDTH,
-#                                                1])
+input_placeholder = tf.placeholder(tf.float32,[None, 
+                                               IMAGE_DEPTH,
+                                               IMAGE_HEIGHT,
+                                               IMAGE_WIDTH,
+                                               1])
 
 # Sample data TF Placeholders
-input_placeholder = tf.placeholder(tf.float32,[None, 
-                                               None,
-                                               512,
-                                               512,
-                                               1])
+# sample_input_placeholder = tf.placeholder(tf.float32,[None, 
+#                                                        None,
+#                                                        512,
+#                                                        512,
+#                                                        1])
 labels_placeholder = tf.placeholder(tf.float32, [None, 1]) # 1 class: 0 or 1
 #training_placeholder = tf.placeholder(tf.bool)
 learning_rate = tf.Variable(INITIAL_LEARNING_RATE, trainable=False)
@@ -62,9 +61,12 @@ def main(*args):
         tf.global_variables_initializer().run()
         print("Training...")
         for step in range(NUM_STEPS):
-            # data_batch, labels_batch = dataset.get_batch(BATCH_SIZE)
-            data_batch, labels_batch = dataset.get_sample_batch()
+            patient, label_batch, data_batch = dataset.get_batch()
+            # data_batch, labels_batch = dataset.get_sample_batch()
+            print("Data Shape:")
             print(data_batch.shape)
+            print("Label Shape:")
+            print(label_batch.shape)
             sys.exit(0)
             feed_dict = {input_placeholder: data_batch,
                          labels_placeholder: labels_batch,
