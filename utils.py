@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import random
 import gzip
+import math
 
 def get_array_from_dcm(filepath, dtype='uint8'):
     ds = dicom.read_file(filepath)
@@ -62,11 +63,8 @@ class TestDataset(object):
         return samples, labels
 
 class Dataset(object):
-    def __init__(self, dir_path, labels_path):
-    
-        def match_labels():
-            # take patient names and match them with the corresponding labels
-            pass
+    def __init__(self, dir_path, labels_path, valid_split=0.2):
+        self.valid_split = valid_split
         self.sample_dir_path = dir_path
         paths = os.listdir(dir_path)
         patient_paths = [os.path.join(dir_path, x) for x in paths]
@@ -84,10 +82,17 @@ class Dataset(object):
                 continue
             self.patients[patient_id] = int(label)
         # print("Did not find {} out of {} total patients".format(len(patients_not_found),len(patient_paths)))
-
         self.patient_nums = len(self.patients)
+        patient_keys = list(self.patients.keys())
+        np.random.shuffle(patient_keys)
+        num_valid = math.ceil(len(patient_keys) * self.valid_split)
+        num_train = len(patient_keys) - num_valid
+        print(num_valid, len(patient_keys))
+        self.train_patients, self.valid_patients = np.split(patient_keys,[num_train,num_valid])
+        print(self.train_patients, self.valid_patients)
 
-    def get_batch(self):
+
+    def get_batch(self, train=True):
         patient = random.choice(list(self.patients.keys()))
         label = self.patients[patient]
         gz_file_path = os.path.join(self.sample_dir_path,patient + '.npy.gz')

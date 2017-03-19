@@ -22,10 +22,15 @@ IMAGE_DEPTH = 325
 # HP
 BATCH_SIZE = 2
 INITIAL_LEARNING_RATE = 1e-3
-NUM_STEPS = 100
+NUM_STEPS = 100000
+VALID_SPLIT = 0.2
+VALID_STEP = 700
+VALID_CKPT_ONE = 10
+VALID_CKPT_TWO = 200
 
 if FLAGS.dataset:
-    dataset = Dataset(FLAGS.dataset,FLAGS.labels)
+    dataset = Dataset(FLAGS.dataset,FLAGS.labels,valid_split=VALID_SPLIT)
+    sys.exit(0)
 else:
     # If no dataset provided, create random data (useful for testing)
     dataset = TestDataset(sample_path=FLAGS.sample_data,label_path=FLAGS.labels)
@@ -59,7 +64,6 @@ loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=_logits,
 
 optimizer = tf.train.AdamOptimizer(learning_rate).minimize(loss)
 
-
 def main(*args):
     with tf.Session() as sess:
         tf.global_variables_initializer().run()
@@ -78,10 +82,31 @@ def main(*args):
             _, l, output = sess.run([optimizer, loss, logits],
                                     feed_dict=feed_dict)
         
-            if step % 10 == 0:
-                print(l)
-                
-                print(list(np.squeeze(output)))
+            if step % VALID_STEP == 0:
+                valid_patient, valid_label_batch, valid_data_batch = dataset.get_batch(train=False)
+                feed_dict = {input_placeholder: valid_data_batch,
+                            labels_placeholder: valid_label_batch,
+                            }
+                valid_l, output = sess.run([loss, logits],
+                                            feed_dict=feed_dict)
+
+            if step == VALID_CKPT_ONE:
+                valid_patient, valid_label_batch, valid_data_batch = dataset.get_batch(train=False)
+                feed_dict = {input_placeholder: valid_data_batch,
+                            labels_placeholder: valid_label_batch,
+                            }
+                valid_l, output = sess.run([loss, logits],
+                                            feed_dict=feed_dict)
+
+            if step == VALID_CKPT_TWO:
+                valid_patient, valid_label_batch, valid_data_batch = dataset.get_batch(train=False)
+                feed_dict = {input_placeholder: valid_data_batch,
+                            labels_placeholder: valid_label_batch,
+                            }
+                valid_l, output = sess.run([loss, logits],
+                                            feed_dict=feed_dict)
+                # print(l)
+                # print(list(np.squeeze(output)))
 
 if __name__ == "__main__":
     tf.app.run()
