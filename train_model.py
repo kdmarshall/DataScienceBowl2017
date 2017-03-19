@@ -15,9 +15,9 @@ tf.app.flags.DEFINE_string("labels", None, 'Path to labels data set.')
 # Globals
 FLAGS = tf.app.flags.FLAGS
 # Using test sizes for now for faster debugging
-IMAGE_WIDTH = 16#256
-IMAGE_HEIGHT = 16#256
-IMAGE_DEPTH = 16#120
+IMAGE_WIDTH = 140
+IMAGE_HEIGHT = 250
+IMAGE_DEPTH = 325
 
 # HP
 BATCH_SIZE = 2
