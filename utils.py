@@ -70,25 +70,70 @@ class Dataset(object):
         paths = os.listdir(dir_path)
         patient_paths = [os.path.join(dir_path, x) for x in paths]
         
+        labels = []
+        
         # We need to match patients with labels
         self.patients = {}
         for patient in patient_paths:
             patient_id = patient.split('/'[-1]).split('.')[0]
-            self.patients[]
-
-        labels = []
+            self.patients[patient_id] = {'path': patient}
+        
+        for label in labels:
+            self.patients[label]['label'] = label['something']
 
         self.patient_nums = len(labels)
+        
+    def transform(arr):
+        
+        # Check shape. TODO: These should be abstracted into a single function (DRY)
+        if arr.shape[0] < 140
+            am = 140 - arr.shape[0]
+            pad = np.random.randint(am)
+            arr = np.lib.pad(arr, ((pad, am-pad),(0, 0),(0, 0)), 'constant', 0)
+        
+        if arr.shape[1] < 250
+            am = 250 - arr.shape[1]
+            pad = np.random.randint(am)
+            arr = np.lib.pad(arr, ((0, 0),(pad, am-pad),(0, 0)), 'constant', 0)
+        
+        if arr.shape[2] < 325
+            am = 325 - arr.shape[2]
+            pad = np.random.randint(am)
+            arr = np.lib.pad(arr, ((0, 0),(0, 0),(pad, am-pad)), 'constant', 0)
+        
+        
+        if arr.shape[0] > 140
+            sl = np.random.randint(arr.shape[0] - 140)
+            arr = array[sl:arr.shape[0] - ((arr.shape[0] - 140) - sl)]
+            
+        if arr.shape[1] > 250
+            sl = np.random.randint(arr.shape[1] - 250)
+            arr = array[sl:arr.shape[1] - ((arr.shape[1] - 250) - sl)]
+        
+        if arr.shape[2] > 325
+            sl = np.random.randint(arr.shape[2] - 325)
+            arr = array[sl:arr.shape[2] - ((arr.shape[2] - 325) - sl)]
+
+        # Normalize values
+        arr[arr == -2000] = 0
+
+        # TODO: Print max/min to see that ranges are as expected
+        return arr
 
     def get_batch():
-        patient_id = random.choice(patient_nums)
-        label = self.labels[patient_id]
-        array_path = self.array_paths[patient_id]
+        patient_id = random.choice(self.patients.keys())
+        label = self.patients[patient_id]['label']
+        _path = self.patients[patient_id]['path']
 
-        gzipfile = gzip.GzipFile(os.path.join(root_p, path), 'r')
+        gzipfile = gzip.GzipFile(_path, 'r')
         arr = np.load(gzipfile)
 
-        # Check shape
+
+
+
+if __name__ == '__main__':
+    # Perform tests on the dataset
+    dataset = Dataset('/Users/Peace/Desktop/from_gcloud/processed', 'test')
 
 
 
