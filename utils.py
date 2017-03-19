@@ -85,43 +85,45 @@ class Dataset(object):
             self.patients[patient_id] = int(label)
         # print("Did not find {} out of {} total patients".format(len(patients_not_found),len(patient_paths)))
 
-        self.patient_nums = len(labels)
+        self.patient_nums = len(self.patients)
         
-    def transform(arr):
+    def transform(self, arr):
         
         # Check shape. TODO: These should be abstracted into a single function (DRY)
-        if arr.shape[0] < 140
+        if arr.shape[0] < 140:
             am = 140 - arr.shape[0]
             pad = np.random.randint(am)
-            arr = np.lib.pad(arr, ((pad, am-pad),(0, 0),(0, 0)), 'constant', 0)
+            arr = np.lib.pad(arr, ((pad, am-pad),(0, 0),(0, 0)), 'constant', constant_values=0)
         
-        if arr.shape[1] < 250
+        if arr.shape[1] < 250:
             am = 250 - arr.shape[1]
             pad = np.random.randint(am)
-            arr = np.lib.pad(arr, ((0, 0),(pad, am-pad),(0, 0)), 'constant', 0)
+            arr = np.lib.pad(arr, ((0, 0),(pad, am-pad),(0, 0)), 'constant', constant_values=0)
         
-        if arr.shape[2] < 325
+        if arr.shape[2] < 325:
             am = 325 - arr.shape[2]
             pad = np.random.randint(am)
-            arr = np.lib.pad(arr, ((0, 0),(0, 0),(pad, am-pad)), 'constant', 0)
+            arr = np.lib.pad(arr, ((0, 0),(0, 0),(pad, am-pad)), 'constant', constant_values=0)
         
         
-        if arr.shape[0] > 140
+        if arr.shape[0] > 140:
             sl = np.random.randint(arr.shape[0] - 140)
-            arr = array[sl:arr.shape[0] - ((arr.shape[0] - 140) - sl)]
+            arr = arr[sl:arr.shape[0] - ((arr.shape[0] - 140) - sl), :, :]
             
-        if arr.shape[1] > 250
+        if arr.shape[1] > 250:
             sl = np.random.randint(arr.shape[1] - 250)
-            arr = array[sl:arr.shape[1] - ((arr.shape[1] - 250) - sl)]
+            arr = arr[:, sl:arr.shape[1] - ((arr.shape[1] - 250) - sl), :]
         
-        if arr.shape[2] > 325
+        if arr.shape[2] > 325:
             sl = np.random.randint(arr.shape[2] - 325)
-            arr = array[sl:arr.shape[2] - ((arr.shape[2] - 325) - sl)]
+            arr = arr[:, :, sl:arr.shape[2] - ((arr.shape[2] - 325) - sl)]
 
         # Normalize values
         arr[arr == -2000] = 0
 
         # TODO: Print max/min to see that ranges are as expected
+        print(np.max(arr))
+        print(np.min(arr))
         return arr
     
     def get_batch(self):
@@ -132,6 +134,7 @@ class Dataset(object):
         sample_arr = np.load(gzipfile)
         label_arr = np.array(label).reshape([-1,1])
         # Check shape
+        sample_arr = self.transform(sample_arr)
         return patient, label_arr, sample_arr
 
 #    def get_batch():
