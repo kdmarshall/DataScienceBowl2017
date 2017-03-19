@@ -85,19 +85,75 @@ class Dataset(object):
         self.patient_nums = len(self.patients)
         patient_keys = list(self.patients.keys())
         np.random.shuffle(patient_keys)
-        num_valid = math.ceil(len(patient_keys) * self.valid_split)
-        num_train = len(patient_keys) - num_valid
-        print(num_valid, len(patient_keys))
-        self.train_patients, self.valid_patients = np.split(patient_keys,[num_train,num_valid])
-        print(self.train_patients, self.valid_patients)
+        num_valid = math.ceil(self.patient_nums * self.valid_split)
+        num_train = self.patient_nums - num_valid
+        self.train_set, self.valid_set = patient_keys[:num_train], patient_keys[num_train:]
+        
+    def transform(self, arr):
+        
+        # Check shape. TODO: These should be abstracted into a single function (DRY)
+        if arr.shape[0] < 140:
+            am = 140 - arr.shape[0]
+            pad = np.random.randint(am)
+            arr = np.lib.pad(arr, ((pad, am-pad),(0, 0),(0, 0)), 'constant', constant_values=0)
+        
+        if arr.shape[1] < 250:
+            am = 250 - arr.shape[1]
+            pad = np.random.randint(am)
+            arr = np.lib.pad(arr, ((0, 0),(pad, am-pad),(0, 0)), 'constant', constant_values=0)
+        
+        if arr.shape[2] < 325:
+            am = 325 - arr.shape[2]
+            pad = np.random.randint(am)
+            arr = np.lib.pad(arr, ((0, 0),(0, 0),(pad, am-pad)), 'constant', constant_values=0)
+        
+        
+        if arr.shape[0] > 140:
+            sl = np.random.randint(arr.shape[0] - 140)
+            arr = arr[sl:arr.shape[0] - ((arr.shape[0] - 140) - sl), :, :]
+            
+        if arr.shape[1] > 250:
+            sl = np.random.randint(arr.shape[1] - 250)
+            arr = arr[:, sl:arr.shape[1] - ((arr.shape[1] - 250) - sl), :]
+        
+        if arr.shape[2] > 325:
+            sl = np.random.randint(arr.shape[2] - 325)
+            arr = arr[:, :, sl:arr.shape[2] - ((arr.shape[2] - 325) - sl)]
 
+        # Normalize values
+        arr[arr == -2000] = 0
 
+        # TODO: Print max/min to see that ranges are as expected
+        print(np.max(arr))
+        print(np.min(arr))
+        return arr
+    
     def get_batch(self, train=True):
-        patient = random.choice(list(self.patients.keys()))
+        data_set = self.train_set if train else self.valid_set
+        patient = random.choice(data_set)
         label = self.patients[patient]
         gz_file_path = os.path.join(self.sample_dir_path,patient + '.npy.gz')
         gzipfile = gzip.GzipFile(gz_file_path, 'r')
         sample_arr = np.load(gzipfile)
         label_arr = np.array(label).reshape([-1,1])
-        # Check shape
+        sample_arr = self.transform(sample_arr)
         return patient, label_arr, sample_arr
+
+#    def get_batch():
+#        patient_id = random.choice(self.patients.keys())
+#        label = self.patients[patient_id]['label']
+#        _path = self.patients[patient_id]['path']
+#
+#        gzipfile = gzip.GzipFile(_path, 'r')
+#        arr = np.load(gzipfile)
+
+
+
+
+if __name__ == '__main__':
+    # Perform tests on the dataset
+    dataset = Dataset('/Users/Peace/Desktop/from_gcloud/processed', 'test')
+
+
+
+

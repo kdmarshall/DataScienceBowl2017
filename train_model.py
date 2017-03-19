@@ -30,7 +30,6 @@ VALID_CKPT_TWO = 200
 
 if FLAGS.dataset:
     dataset = Dataset(FLAGS.dataset,FLAGS.labels,valid_split=VALID_SPLIT)
-    sys.exit(0)
 else:
     # If no dataset provided, create random data (useful for testing)
     dataset = TestDataset(sample_path=FLAGS.sample_data,label_path=FLAGS.labels)
@@ -70,17 +69,17 @@ def main(*args):
         print("Training...")
         for step in range(NUM_STEPS):
             patient, label_batch, data_batch = dataset.get_batch()
-            # data_batch, labels_batch = dataset.get_sample_batch()
             print("Data Shape:")
             print(data_batch.shape)
-            print("Label Shape:")
-            print(label_batch.shape)
             sys.exit(0)
             feed_dict = {input_placeholder: data_batch,
                          labels_placeholder: label_batch,
                           }
             _, l, output = sess.run([optimizer, loss, logits],
                                     feed_dict=feed_dict)
+
+            print(l)
+            print(list(np.squeeze(output)))
         
             if step % VALID_STEP == 0:
                 valid_patient, valid_label_batch, valid_data_batch = dataset.get_batch(train=False)
@@ -89,6 +88,8 @@ def main(*args):
                             }
                 valid_l, output = sess.run([loss, logits],
                                             feed_dict=feed_dict)
+                print("Validation loss {}".format(l))
+                print(list(np.squeeze(output)))
 
             if step == VALID_CKPT_ONE:
                 valid_patient, valid_label_batch, valid_data_batch = dataset.get_batch(train=False)
@@ -97,6 +98,8 @@ def main(*args):
                             }
                 valid_l, output = sess.run([loss, logits],
                                             feed_dict=feed_dict)
+                print("Validation loss {}".format(l))
+                print(list(np.squeeze(output)))
 
             if step == VALID_CKPT_TWO:
                 valid_patient, valid_label_batch, valid_data_batch = dataset.get_batch(train=False)
@@ -105,8 +108,8 @@ def main(*args):
                             }
                 valid_l, output = sess.run([loss, logits],
                                             feed_dict=feed_dict)
-                # print(l)
-                # print(list(np.squeeze(output)))
+                print("Validation loss {}".format(l))
+                print(list(np.squeeze(output)))
 
 if __name__ == "__main__":
     tf.app.run()
