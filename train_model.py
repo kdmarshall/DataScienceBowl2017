@@ -11,7 +11,7 @@ from models import baseline_model as model
 tf.app.flags.DEFINE_string("dataset", None, 'Path to dataset h5.')
 tf.app.flags.DEFINE_string("sample_data", None, 'Path to sample data set directory.')
 tf.app.flags.DEFINE_string("labels", None, 'Path to labels data set.')
-
+tf.app.flags.DEFINE_string("model", None, 'Directory path to save out model and tensorboard files.')
 # Globals
 FLAGS = tf.app.flags.FLAGS
 # Using test sizes for now for faster debugging
@@ -29,6 +29,10 @@ if FLAGS.dataset:
 else:
     # If no dataset provided, create random data (useful for testing)
     dataset = TestDataset(sample_path=FLAGS.sample_data,label_path=FLAGS.labels)
+
+if FLAGS.model:
+    if not os.path.exists(FLAGS.model):
+        os.makedirs(FLAGS.model)
 
 # TF Placeholders
 input_placeholder = tf.placeholder(tf.float32,[None, 
@@ -69,7 +73,7 @@ def main(*args):
             print(label_batch.shape)
             sys.exit(0)
             feed_dict = {input_placeholder: data_batch,
-                         labels_placeholder: labels_batch,
+                         labels_placeholder: label_batch,
                           }
             _, l, output = sess.run([optimizer, loss, logits],
                                     feed_dict=feed_dict)
