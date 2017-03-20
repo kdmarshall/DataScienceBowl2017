@@ -89,23 +89,23 @@ class Dataset(object):
         num_train = self.patient_nums - num_valid
         self.train_set, self.valid_set = patient_keys[:num_train], patient_keys[num_train:]
         
-    def transform(self, arr):
-        
+    def transform(self, arr, get_stats=False):
+        #print(arr.shape)
         # Check shape. TODO: These should be abstracted into a single function (DRY)
         if arr.shape[0] < 140:
             am = 140 - arr.shape[0]
             pad = np.random.randint(am)
-            arr = np.lib.pad(arr, ((pad, am-pad),(0, 0),(0, 0)), 'constant', constant_values=0)
+            arr = np.lib.pad(arr, ((pad, am-pad),(0, 0),(0, 0)), 'constant', constant_values=-2000)
         
         if arr.shape[1] < 250:
             am = 250 - arr.shape[1]
             pad = np.random.randint(am)
-            arr = np.lib.pad(arr, ((0, 0),(pad, am-pad),(0, 0)), 'constant', constant_values=0)
+            arr = np.lib.pad(arr, ((0, 0),(pad, am-pad),(0, 0)), 'constant', constant_values=-2000)
         
         if arr.shape[2] < 325:
             am = 325 - arr.shape[2]
             pad = np.random.randint(am)
-            arr = np.lib.pad(arr, ((0, 0),(0, 0),(pad, am-pad)), 'constant', constant_values=0)
+            arr = np.lib.pad(arr, ((0, 0),(0, 0),(pad, am-pad)), 'constant', constant_values=-2000)
         
         
         if arr.shape[0] > 140:
@@ -121,12 +121,22 @@ class Dataset(object):
             arr = arr[:, :, sl:arr.shape[2] - ((arr.shape[2] - 325) - sl)]
 
         # Normalize values
-        arr[arr == -2000] = 0
-
+        mask = arr<-800
+        mask += arr>400
+        
         # TODO: Print max/min to see that ranges are as expected
-        print(np.max(arr))
-        print(np.min(arr))
-        return arr
+        #print(np.max(arr))
+        #print(np.min(arr))
+        if not get_stats:
+            mean = -521.740256986
+            std = 289.3945501514394
+            arr = (arr.astype('float32') - mean)/std
+            arr[mask] = 0
+            return arr
+        else:
+            values = np.extract(np.invert(mask), arr)
+            return values
+            
     
     def get_batch(self, train=True):
         data_set = self.train_set if train else self.valid_set
@@ -138,6 +148,40 @@ class Dataset(object):
         label_arr = np.array(label).reshape([-1,1])
         sample_arr = self.transform(sample_arr)
         return patient, label_arr, sample_arr
+
+    def compute_statistics(self):
+        
+        data_set = sorted(self.train_set)
+        values = []
+        print("Computing stats for {} patients...".format(len(data_set)))
+        n = 0
+        mean = 0
+        M2 = 0
+        for patient in data_set:
+        
+            gz_file_path = os.path.join(self.sample_dir_path,patient + '.npy.gz')
+            gzipfile = gzip.GzipFile(gz_file_path, 'r')
+            sample_arr = np.load(gzipfile)
+
+            values += list(self.transform(sample_arr, True))
+        
+            for x in self.transform(sample_arr, True):
+                n = n + 1
+                delta = x - mean
+                mean = mean + delta/n
+                M2 = M2 + delta*(x - mean)
+            print(mean)
+            print(math.sqrt(M2/(n - 1)))
+    
+        #m = np.mean(values)
+        #s = np.std(values)
+        
+        print(mean)
+        print(math.sqrt(M2/(n - 1)))
+
+        #print(m)
+        #print(s)
+        print("Total voxels included: {}".format(len(values)))
 
 #    def get_batch():
 #        patient_id = random.choice(self.patients.keys())

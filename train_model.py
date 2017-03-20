@@ -69,6 +69,10 @@ def main(*args):
         print("Training...")
         for step in range(NUM_STEPS):
             patient, label_batch, data_batch = dataset.get_batch()
+            #print(np.min(data_batch))
+            #print(np.mean(data_batch))
+            #print(np.max(data_batch))
+            
             print("Data Shape:")
             print(data_batch.shape)
             sys.exit(0)
