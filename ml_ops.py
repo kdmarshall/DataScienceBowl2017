@@ -106,7 +106,21 @@ def fc_layer(input, o_units, name, activate=True):
 
     return h_fc
 
-
+def graph_histograms(layer_names):
+	for name in layer_names:
+		if 'conv' in name:
+			with tf.variable_scope(name) as scope_conv: 
+				tf.get_variable_scope().reuse_variables()
+				bias = tf.get_variable('b')
+				tf.summary.histogram(bias.name, bias)
+				weights = tf.get_variable('w')
+				tf.summary.histogram(weights.name, weights)
+		elif 'fc' in name:
+			tf.get_variable_scope().reuse_variables()
+			fc = tf.get_variable(name)
+			tf.summary.histogram(fc.name, fc)
+			fc_b = tf.get_variable(name+"_b")
+			tf.summary.histogram(fc_b.name, fc_b)
 
 
 

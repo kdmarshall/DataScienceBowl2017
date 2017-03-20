@@ -28,6 +28,9 @@ VALID_STEP = 700
 VALID_CKPT_ONE = 10
 VALID_CKPT_TWO = 200
 
+# Tensorboard options
+LAYERS_TO_GRAPH = ('conv1','conv2','conv3','conv4','conv5','conv6','fc1','fc2')
+
 if FLAGS.dataset:
     dataset = Dataset(FLAGS.dataset,FLAGS.labels,valid_split=VALID_SPLIT)
 else:
@@ -43,8 +46,6 @@ if FLAGS.model[-1] == '/':
 else:
     model_name = FLAGS.model.split('/')[-1]
     model_path = os.path.join(FLAGS.model, model_name+'.ckpt')
-
-saver = tf.train.Saver()
 
 # TF Placeholders
 input_placeholder = tf.placeholder(tf.float32,[None,
@@ -67,13 +68,19 @@ _logits = model(input_placeholder)
 logits = tf.nn.sigmoid(_logits)
 
 loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=_logits,
-                                                    labels=labels_placeholder))
-
+                                                              labels=labels_placeholder))
+# Add loss to Tensorboard
+tf.summary.scalar('loss', loss)
 optimizer = tf.train.AdamOptimizer(learning_rate).minimize(loss)
 
 def main(*args):
     with tf.Session() as sess:
+        saver = tf.train.Saver()
+        merged = tf.summary.merge_all()
+        writer = tf.summary.FileWriter(FLAGS.model,
+                                       sess.graph)
         tf.global_variables_initializer().run()
+        graph_histograms(LAYERS_TO_GRAPH)
         print("Training...")
         for step in range(NUM_STEPS):
             patient, label_batch, data_batch = dataset.get_batch()
@@ -87,8 +94,11 @@ def main(*args):
             feed_dict = {input_placeholder: data_batch,
                          labels_placeholder: label_batch,
                           }
-            _, l, output = sess.run([optimizer, loss, logits],
-                                    feed_dict=feed_dict)
+            _, l, output, summary = sess.run([optimizer, loss, logits, merged],
+                                             feed_dict=feed_dict)
+            # Write summary object to Tensorboard
+            # So far only writing training data
+            writer.add_summary(summary, step)
 
             print(l)
             print(list(np.squeeze(output)))
