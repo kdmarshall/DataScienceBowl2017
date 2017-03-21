@@ -28,11 +28,12 @@ class TestDataset(object):
             self.label_path = label_path
             self.samples,self.labels = self._build_sample_set()
     
-    def get_batch(self, batch_size):
-        data = np.ones((batch_size, 16, 16, 16, 1)) * 0.001
+    def get_batch(self, batch_size=1, train=True):
+        #data = np.ones((batch_size, 16, 16, 16, 1)) * 0.001
+        data = np.ones((batch_size, 140, 250, 325, 1)) * 0.001
         labels = np.ones((batch_size, 1))
 
-        return data, labels
+        return 'test', labels, data
 
     def get_sample_batch(self):
         data_len = len(self.samples)

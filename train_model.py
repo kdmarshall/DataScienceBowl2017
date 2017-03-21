@@ -88,25 +88,29 @@ def main(*args):
             #print(np.mean(data_batch))
             #print(np.max(data_batch))
             
-            print("Data Shape:")
-            print(data_batch.shape)
+            if step == 0:
+                print("Data Shape:")
+                print(data_batch.shape)
+            
             data_batch = data_batch.reshape([1,
                                              IMAGE_HEIGHT,
                                              IMAGE_WIDTH,
                                              IMAGE_DEPTH,
                                              1])
+                                             
             feed_dict = {input_placeholder: data_batch,
                          labels_placeholder: label_batch,
                           }
             _, l, output, summary = sess.run([optimizer, loss, logits, merged],
                                              feed_dict=feed_dict)
+
+            print(l)
+            #print(list(np.squeeze(output)))
+            
             # Write summary object to Tensorboard
             # So far only writing training data
             writer.add_summary(summary, step)
 
-            print(l)
-            print(list(np.squeeze(output)))
-        
             if step % VALID_STEP == 0:
                 valid_patient, valid_label_batch, valid_data_batch = dataset.get_batch(train=False)
                 feed_dict = {input_placeholder: valid_data_batch,
@@ -116,7 +120,7 @@ def main(*args):
                                             feed_dict=feed_dict)
                 saver.save(sess, model_path, step)
                 print("Validation loss {}".format(l))
-                print(list(np.squeeze(output)))
+                #print(list(np.squeeze(output)))
 
             if step == VALID_CKPT_ONE:
                 valid_patient, valid_label_batch, valid_data_batch = dataset.get_batch(train=False)
@@ -126,7 +130,7 @@ def main(*args):
                 valid_l, output = sess.run([loss, logits],
                                             feed_dict=feed_dict)
                 print("Validation loss {}".format(l))
-                print(list(np.squeeze(output)))
+                #print(list(np.squeeze(output)))
 
             if step == VALID_CKPT_TWO:
                 valid_patient, valid_label_batch, valid_data_batch = dataset.get_batch(train=False)
@@ -136,7 +140,7 @@ def main(*args):
                 valid_l, output = sess.run([loss, logits],
                                             feed_dict=feed_dict)
                 print("Validation loss {}".format(l))
-                print(list(np.squeeze(output)))
+                #print(list(np.squeeze(output)))
 
 if __name__ == "__main__":
     tf.app.run()
