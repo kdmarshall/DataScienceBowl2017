@@ -1,7 +1,5 @@
 import numpy as np
 import tensorflow as tf
-import dicom
-
 
 def conv3d(x, W):
 	return tf.nn.conv3d(x,
