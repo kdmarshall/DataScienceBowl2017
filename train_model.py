@@ -111,8 +111,13 @@ def main(*args):
             # So far only writing training data
             writer.add_summary(summary, step)
 
-            if step % VALID_STEP == 0:
+            if step % VALID_STEP == 0 or step == 10 or step == 200:
                 valid_patient, valid_label_batch, valid_data_batch = dataset.get_batch(train=False)
+                valid_data_batch = valid_data_batch.reshape([1,
+                                                 IMAGE_HEIGHT,
+                                                 IMAGE_WIDTH,
+                                                 IMAGE_DEPTH,
+                                                 1])
                 feed_dict = {input_placeholder: valid_data_batch,
                             labels_placeholder: valid_label_batch,
                             }
@@ -122,25 +127,25 @@ def main(*args):
                 print("Validation loss {}".format(l))
                 #print(list(np.squeeze(output)))
 
-            if step == VALID_CKPT_ONE:
-                valid_patient, valid_label_batch, valid_data_batch = dataset.get_batch(train=False)
-                feed_dict = {input_placeholder: valid_data_batch,
-                            labels_placeholder: valid_label_batch,
-                            }
-                valid_l, output = sess.run([loss, logits],
-                                            feed_dict=feed_dict)
-                print("Validation loss {}".format(l))
-                #print(list(np.squeeze(output)))
-
-            if step == VALID_CKPT_TWO:
-                valid_patient, valid_label_batch, valid_data_batch = dataset.get_batch(train=False)
-                feed_dict = {input_placeholder: valid_data_batch,
-                            labels_placeholder: valid_label_batch,
-                            }
-                valid_l, output = sess.run([loss, logits],
-                                            feed_dict=feed_dict)
-                print("Validation loss {}".format(l))
-                #print(list(np.squeeze(output)))
+#            if step == VALID_CKPT_ONE:
+#                valid_patient, valid_label_batch, valid_data_batch = dataset.get_batch(train=False)
+#                feed_dict = {input_placeholder: valid_data_batch,
+#                            labels_placeholder: valid_label_batch,
+#                            }
+#                valid_l, output = sess.run([loss, logits],
+#                                            feed_dict=feed_dict)
+#                print("Validation loss {}".format(l))
+#                #print(list(np.squeeze(output)))
+#
+#            if step == VALID_CKPT_TWO:
+#                valid_patient, valid_label_batch, valid_data_batch = dataset.get_batch(train=False)
+#                feed_dict = {input_placeholder: valid_data_batch,
+#                            labels_placeholder: valid_label_batch,
+#                            }
+#                valid_l, output = sess.run([loss, logits],
+#                                            feed_dict=feed_dict)
+#                print("Validation loss {}".format(l))
+#                #print(list(np.squeeze(output)))
 
 if __name__ == "__main__":
     tf.app.run()

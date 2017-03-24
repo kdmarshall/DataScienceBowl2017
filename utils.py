@@ -87,7 +87,7 @@ class Dataset(object):
         patient_keys = list(self.patients.keys())
         np.random.shuffle(patient_keys)
         num_valid = math.ceil(self.patient_nums * self.valid_split)
-        num_train = self.patient_nums - num_valid
+        num_train = int(self.patient_nums - num_valid)
         self.train_set, self.valid_set = patient_keys[:num_train], patient_keys[num_train:]
         
     def transform(self, arr, get_stats=False):
