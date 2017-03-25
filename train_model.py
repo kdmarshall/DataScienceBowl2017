@@ -94,7 +94,7 @@ def main(*args):
                 print("Data Shape:")
                 print(data_batch.shape)
             
-            data_batch = data_batch.reshape([1,
+            data_batch = data_batch.reshape([-1,
                                              IMAGE_HEIGHT,
                                              IMAGE_WIDTH,
                                              IMAGE_DEPTH,
@@ -127,7 +127,7 @@ def main(*args):
                 v_losses = []
                 for vstep in range(100):
                     valid_patient, valid_label_batch, valid_data_batch = dataset.get_batch(train=False, batch_size=BATCH_SIZE)
-                    valid_data_batch = valid_data_batch.reshape([1,
+                    valid_data_batch = valid_data_batch.reshape([-1,
                                                      IMAGE_HEIGHT,
                                                      IMAGE_WIDTH,
                                                      IMAGE_DEPTH,
