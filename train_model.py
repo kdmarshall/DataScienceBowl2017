@@ -82,6 +82,8 @@ def main(*args):
         tf.global_variables_initializer().run()
         graph_histograms(LAYERS_TO_GRAPH)
         print("Training...")
+        training_losses = []
+        best_valid = 99999999
         for step in range(NUM_STEPS):
             patient, label_batch, data_batch = dataset.get_batch()
             #print(np.min(data_batch))
@@ -104,7 +106,7 @@ def main(*args):
             _, l, output, summary = sess.run([optimizer, loss, logits, merged],
                                              feed_dict=feed_dict)
 
-            print(l)
+            training_losses.append(l)
             #print(list(np.squeeze(output)))
             
             # Write summary object to Tensorboard
@@ -112,20 +114,37 @@ def main(*args):
             writer.add_summary(summary, step)
 
             if step % VALID_STEP == 0 or step == 10 or step == 200:
-                valid_patient, valid_label_batch, valid_data_batch = dataset.get_batch(train=False)
-                valid_data_batch = valid_data_batch.reshape([1,
-                                                 IMAGE_HEIGHT,
-                                                 IMAGE_WIDTH,
-                                                 IMAGE_DEPTH,
-                                                 1])
-                feed_dict = {input_placeholder: valid_data_batch,
-                            labels_placeholder: valid_label_batch,
-                            }
-                valid_l, output = sess.run([loss, logits],
-                                            feed_dict=feed_dict)
-                saver.save(sess, model_path, step)
-                print("Validation loss {}".format(l))
+
+                print("Training loss {}".format(np.mean(training_losses)))
+                training_losses = []
+                
                 #print(list(np.squeeze(output)))
+
+                if step == 0:
+                    break
+
+                print("Validating...")
+                v_losses = []
+                for vstep in range(100):
+                    valid_patient, valid_label_batch, valid_data_batch = dataset.get_batch(train=False)
+                    valid_data_batch = valid_data_batch.reshape([1,
+                                                     IMAGE_HEIGHT,
+                                                     IMAGE_WIDTH,
+                                                     IMAGE_DEPTH,
+                                                     1])
+                    feed_dict = {input_placeholder: valid_data_batch,
+                                labels_placeholder: valid_label_batch,
+                                }
+                    valid_l, output = sess.run([loss, logits],
+                                                feed_dict=feed_dict)
+                    v_losses.append(valid_l)
+                    
+                if np.mean(v_losses) < best_valid:
+                    best_valid = np.mean(v_losses)
+                    saver.save(sess, model_path, step)
+                    print("V Loss improved.")
+
+                print("Validation loss {}".format(np.mean(v_losses)))
 
 #            if step == VALID_CKPT_ONE:
 #                valid_patient, valid_label_batch, valid_data_batch = dataset.get_batch(train=False)
