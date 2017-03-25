@@ -85,7 +85,7 @@ def main(*args):
         training_losses = []
         best_valid = 99999999
         for step in range(NUM_STEPS):
-            patient, label_batch, data_batch = dataset.get_batch()
+            patient, label_batch, data_batch = dataset.get_batch(batch_size=BATCH_SIZE)
             #print(np.min(data_batch))
             #print(np.mean(data_batch))
             #print(np.max(data_batch))
