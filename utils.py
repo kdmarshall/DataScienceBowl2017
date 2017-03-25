@@ -139,16 +139,23 @@ class Dataset(object):
             return values
             
     
-    def get_batch(self, train=True):
-        data_set = self.train_set if train else self.valid_set
-        patient = random.choice(data_set)
-        label = self.patients[patient]
-        gz_file_path = os.path.join(self.sample_dir_path,patient + '.npy.gz')
-        gzipfile = gzip.GzipFile(gz_file_path, 'r')
-        sample_arr = np.load(gzipfile)
-        label_arr = np.array(label).reshape([-1,1])
-        sample_arr = self.transform(sample_arr)
-        return patient, label_arr, sample_arr
+    def get_batch(self, train=True, batch_size=1):
+        patients = []
+        labels = []
+        samples = []
+        for i in range(batch_size):
+            data_set = self.train_set if train else self.valid_set
+            patient = random.choice(data_set)
+            label = self.patients[patient]
+            gz_file_path = os.path.join(self.sample_dir_path,patient + '.npy.gz')
+            gzipfile = gzip.GzipFile(gz_file_path, 'r')
+            sample_arr = np.load(gzipfile)
+            #label_arr = np.array(label).reshape([-1,1])
+            labels.append(label)
+            sample_arr = self.transform(sample_arr)
+            patients.append(patient)
+            samples.append(sample_arr)
+        return patients, np.array(labels).reshape([-1, 1]), np.stack(samples)
 
     def compute_statistics(self):
         
