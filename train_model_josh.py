@@ -6,7 +6,7 @@ import numpy as np
 
 from utils import *
 from ml_ops import *
-from models import baseline_model as model
+from models import larger_first_model as model
 
 tf.app.flags.DEFINE_string("dataset", None, 'Path to dataset h5.')
 tf.app.flags.DEFINE_string("sample_data", None, 'Path to sample data set directory.')
@@ -14,6 +14,9 @@ tf.app.flags.DEFINE_string("labels", None, 'Path to labels data set.')
 tf.app.flags.DEFINE_string("model", None, 'Directory path to save out model and tensorboard files.')
 # Globals
 FLAGS = tf.app.flags.FLAGS
+VALID_STEP = 700
+VALID_CKPT_ONE = 10
+VALID_CKPT_TWO = 200
 # Using test sizes for now for faster debugging
 IMAGE_HEIGHT = 140
 IMAGE_WIDTH = 250
@@ -22,11 +25,8 @@ IMAGE_DEPTH = 325
 # HP
 BATCH_SIZE = 2
 INITIAL_LEARNING_RATE = 1e-3
-NUM_STEPS = 100000
+NUM_STEPS = 1000000
 VALID_SPLIT = 0.2
-VALID_STEP = 700
-VALID_CKPT_ONE = 10
-VALID_CKPT_TWO = 200
 
 # Tensorboard options
 LAYERS_TO_GRAPH = ('conv1','conv2','conv3','conv4','conv5','conv6','fc1','fc2')
