@@ -121,7 +121,7 @@ def main(*args):
                 #print(list(np.squeeze(output)))
 
                 if step == 0:
-                    break
+                    continue
 
                 print("Validating...")
                 v_losses = []
