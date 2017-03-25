@@ -59,11 +59,12 @@ def prelu(_x):
 
   return pos + neg
 
-def convolve(input, i_units, o_units, name, kernel=3, activate=True, pool=True):
+def convolve(input, i_units, o_units, name, kernel=3, activate=True, pool=True,init_2d=True):
+	initializer_func = tf.contrib.layers.xavier_initializer_conv2d if init_2d else tf.contrib.layers.xavier_initializer
     with tf.variable_scope(name):
         conv_weights = tf.get_variable("w", [kernel, kernel, kernel, i_units,
                                                o_units],
-                        initializer=tf.contrib.layers.xavier_initializer_conv2d()) # Note: 3d init not available. Think about this more.
+                        initializer=initializer_func()) # Note: 3d init not available. Think about this more.
         conv_bias = tf.get_variable("b",
                                     initializer=tf.constant(0., shape=[o_units]))
         pre = tf.nn.conv3d(input, conv_weights,
