@@ -115,13 +115,8 @@ def main(*args):
 
             if step % VALID_STEP == 0 or step == 10 or step == 200:
 
-                print("Training loss {}".format(np.mean(training_losses)))
-                training_losses = []
-                
-                #print(list(np.squeeze(output)))
 
-                if step == 0:
-                    continue
+                #print(list(np.squeeze(output)))
 
                 print("Validating...")
                 v_losses = []
@@ -139,12 +134,18 @@ def main(*args):
                                                 feed_dict=feed_dict)
                     v_losses.append(valid_l)
                     
+                    if step == 0:
+                        break
+                
+                v_term = ""
                 if np.mean(v_losses) < best_valid:
                     best_valid = np.mean(v_losses)
                     saver.save(sess, model_path, step)
-                    print("V Loss improved.")
+                    v_term = " I"
+                        
 
-                print("Validation loss {}".format(np.mean(v_losses)))
+                print("{} T: {} V: {}{}".format(step, np.mean(training_losses), np.mean(v_losses), v_term))
+                training_losses = []
 
 #            if step == VALID_CKPT_ONE:
 #                valid_patient, valid_label_batch, valid_data_batch = dataset.get_batch(train=False)
