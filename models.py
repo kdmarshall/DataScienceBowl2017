@@ -168,17 +168,17 @@ def recycled(input):
 
         FC Output Layer that provides the single logits unit
     """
-    h_conv1 = convolve_recycle(input, 1, 8, 'conv1', reflux=6)
-    h_conv2 = convolve_recycle(h_conv1, 8, 16, 'conv2', reflux=5)
-    h_conv3 = convolve_recycle(h_conv2, 16, 16, 'conv3', reflux=4)
-    h_conv4 = convolve_recycle(h_conv3, 16, 32, 'conv4', reflux=3)
-    h_conv5 = convolve_recycle(h_conv4, 32, 64, 'conv5', reflux=2)
-    h_conv6 = convolve_recycle(h_conv5, 64, 128, 'conv6', reflux=1)
+    h_conv1 = convolve_recycle(input, 1, 32, 'conv1', reflux=1)
+    h_conv2 = convolve_recycle(h_conv1, 32, 32, 'conv2', reflux=5)
+    h_conv3 = convolve_recycle(h_conv2, 32, 32, 'conv3', reflux=4)
+    h_conv4 = convolve_recycle(h_conv3, 32, 32, 'conv4', reflux=3)
+    h_conv5 = convolve_recycle(h_conv4, 32, 32, 'conv5', reflux=2)
+    h_conv6 = convolve_recycle(h_conv5, 32, 64, 'conv6', reflux=1)
     
     print("Transfer layer shape: {}".format(h_conv6.get_shape()))
     
-    h_fc1 = fc_layer2(h_conv6, 64, 'fc1')
-    h_fc2 = fc_layer2(h_fc1, 32, 'fc2')
+    h_fc1 = fc_layer2(h_conv6, 32, 'fc1')
+    h_fc2 = fc_layer2(h_fc1, 16, 'fc2')
     output_logits = fc_layer2(h_fc2, 1, 'fc3', activate=False)
     
     print(output_logits.get_shape())
