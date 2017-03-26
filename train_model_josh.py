@@ -6,7 +6,7 @@ import numpy as np
 
 from utils import *
 from ml_ops import *
-from models import larger_first_model as model
+from models import balanced as model
 
 tf.app.flags.DEFINE_string("dataset", None, 'Path to dataset h5.')
 tf.app.flags.DEFINE_string("sample_data", None, 'Path to sample data set directory.')
