@@ -168,12 +168,12 @@ def recycled(input):
 
         FC Output Layer that provides the single logits unit
     """
-    h_conv1 = convolve_recycle(input, 1, 32, 'conv1', reflux=1)
-    h_conv2 = convolve_recycle(h_conv1, 32, 32, 'conv2', reflux=5)
-    h_conv3 = convolve_recycle(h_conv2, 32, 32, 'conv3', reflux=4)
-    h_conv4 = convolve_recycle(h_conv3, 32, 32, 'conv4', reflux=3)
-    h_conv5 = convolve_recycle(h_conv4, 32, 32, 'conv5', reflux=2)
-    h_conv6 = convolve_recycle(h_conv5, 32, 64, 'conv6', reflux=1)
+    h_conv1 = convolve_recycle(input, 1, 16, 'conv1', reflux=1)
+    h_conv2 = convolve_recycle(h_conv1, 16, 16, 'conv2', reflux=5)
+    h_conv3 = convolve_recycle(h_conv2, 16, 16, 'conv3', reflux=4)
+    h_conv4 = convolve_recycle(h_conv3, 16, 16, 'conv4', reflux=3)
+    h_conv5 = convolve_recycle(h_conv4, 16, 16, 'conv5', reflux=2)
+    h_conv6 = convolve_recycle(h_conv5, 16, 16, 'conv6', reflux=1)
     
     print("Transfer layer shape: {}".format(h_conv6.get_shape()))
     
