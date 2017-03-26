@@ -148,9 +148,9 @@ def balanced(input):
     
     print("Transfer layer shape: {}".format(h_conv6.get_shape()))
     
-    h_fc1 = fc_layer(h_conv6, 128, 'fc1')
-    h_fc2 = fc_layer(h_fc1, 32, 'fc2')
-    output_logits = fc_layer(h_fc2, 1, 'fc3', activate=False)
+    h_fc1 = fc_layer2(h_conv6, 128, 'fc1')
+    h_fc2 = fc_layer2(h_fc1, 32, 'fc2')
+    output_logits = fc_layer2(h_fc2, 1, 'fc3', activate=False)
     
     print(output_logits.get_shape())
         

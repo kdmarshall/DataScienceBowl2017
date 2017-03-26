@@ -85,12 +85,35 @@ def convolve(input, i_units, o_units, name, kernel=3, activate=True, pool=True,i
 
 	return pooled
 
+def fc_layer2(input, o_units, name, activate=True):
+    batch_size = tf.shape(input)[0]
+
+    input_reshaped = tf.reshape(input, [batch_size, -1])
+
+    in_size = np.prod(input.get_shape().as_list()[1:])
+    
+    with tf.variable_scope(name):
+        fc_weights = tf.get_variable(name, [in_size, o_units],
+                        initializer=tf.contrib.layers.xavier_initializer())
+        fc_bias = tf.get_variable("{0}_b".format(name),
+                        initializer=tf.constant(0., shape=[o_units]))
+
+        pre = tf.nn.bias_add(tf.matmul(input_reshaped, fc_weights), fc_bias)
+
+        if activate:
+            h_fc = prelu(pre)
+        else:
+            h_fc = pre
+
+    return h_fc
+
 def fc_layer(input, o_units, name, activate=True):
     batch_size = tf.shape(input)[0]
 
     input_reshaped = tf.reshape(input, [batch_size, -1])
 
     in_size = np.prod(input.get_shape().as_list()[1:])
+    
     fc_weights = tf.get_variable(name, [in_size, o_units],
                     initializer=tf.contrib.layers.xavier_initializer())
     fc_bias = tf.get_variable("{0}_b".format(name),
