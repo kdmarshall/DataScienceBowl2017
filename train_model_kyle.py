@@ -6,7 +6,7 @@ import numpy as np
 
 from utils import *
 from ml_ops import *
-from models import baseline_model_robert as model
+from models import non2d_init_model as model
 
 tf.app.flags.DEFINE_string("dataset", None, 'Path to dataset h5.')
 tf.app.flags.DEFINE_string("sample_data", None, 'Path to sample data set directory.')
@@ -23,8 +23,8 @@ IMAGE_WIDTH = 250
 IMAGE_DEPTH = 325
 
 # HP
-BATCH_SIZE = 16
-INITIAL_LEARNING_RATE = 5e-4
+BATCH_SIZE = 2
+INITIAL_LEARNING_RATE = 1e-3
 NUM_STEPS = 1000000
 VALID_SPLIT = 0.2
 

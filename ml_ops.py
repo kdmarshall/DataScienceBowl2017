@@ -59,30 +59,31 @@ def prelu(_x):
 
   return pos + neg
 
-def convolve(input, i_units, o_units, name, kernel=3, activate=True, pool=True):
-    with tf.variable_scope(name):
-        conv_weights = tf.get_variable("w", [kernel, kernel, kernel, i_units,
-                                               o_units],
-                        initializer=tf.contrib.layers.xavier_initializer_conv2d()) # Note: 3d init not available. Think about this more.
-        conv_bias = tf.get_variable("b",
-                                    initializer=tf.constant(0., shape=[o_units]))
-        pre = tf.nn.conv3d(input, conv_weights,
-                                strides=[1, 1, 1, 1, 1], padding='SAME') + conv_bias
-                                
-        if activate:
-            h_conv1 = prelu(pre)
-        else:
-            h_conv1 = pre
+def convolve(input, i_units, o_units, name, kernel=3, activate=True, pool=True,init_2d=True):
+	initializer_func = tf.contrib.layers.xavier_initializer_conv2d if init_2d else tf.contrib.layers.xavier_initializer
+	with tf.variable_scope(name):
+	    conv_weights = tf.get_variable("w", [kernel, kernel, kernel, i_units,
+	                                           o_units],
+	                    initializer=initializer_func()) # Note: 3d init not available. Think about this more.
+	    conv_bias = tf.get_variable("b",
+	                                initializer=tf.constant(0., shape=[o_units]))
+	    pre = tf.nn.conv3d(input, conv_weights,
+	                            strides=[1, 1, 1, 1, 1], padding='SAME') + conv_bias
+	                            
+	    if activate:
+	        h_conv1 = prelu(pre)
+	    else:
+	        h_conv1 = pre
 
-    if pool:
-        pooled = tf.nn.max_pool3d(h_conv1,
+	if pool:
+	    pooled = tf.nn.max_pool3d(h_conv1,
 							ksize=[1, 2, 2, 2, 1],
 							strides=[1, 2, 2, 2, 1],
 							padding='SAME')
-    else:
-        pooled = h_conv1
+	else:
+	    pooled = h_conv1
 
-    return pooled
+	return pooled
 
 def fc_layer(input, o_units, name, activate=True):
     batch_size = tf.shape(input)[0]
