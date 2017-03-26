@@ -29,7 +29,7 @@ NUM_STEPS = 1000000
 VALID_SPLIT = 0.2
 
 # Tensorboard options
-LAYERS_TO_GRAPH = ('conv1','conv2','conv3','conv4','conv5','conv6','fc1','fc2')
+LAYERS_TO_GRAPH = ('conv1','conv2','conv3','conv4','conv5','conv6','fc1','fc2','fc3')
 
 if FLAGS.dataset:
     dataset = Dataset(FLAGS.dataset,FLAGS.labels,valid_split=VALID_SPLIT)
@@ -80,7 +80,7 @@ def main(*args):
         writer = tf.summary.FileWriter(FLAGS.model,
                                        sess.graph)
         tf.global_variables_initializer().run()
-        graph_histograms(LAYERS_TO_GRAPH)
+        #graph_histograms(LAYERS_TO_GRAPH)
         print("Training...")
         training_losses = []
         best_valid = 99999999
