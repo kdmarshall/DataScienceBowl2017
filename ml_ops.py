@@ -85,6 +85,38 @@ def convolve(input, i_units, o_units, name, kernel=3, activate=True, pool=True,i
 
 	return pooled
 
+def convolve_recycle(input, i_units, o_units, name, kernel=3, activate=True, pool=True,init_2d=True, reflux=3):
+	initializer_func = tf.contrib.layers.xavier_initializer_conv2d if init_2d else tf.contrib.layers.xavier_initializer
+	with tf.variable_scope(name):
+        conv_weights = tf.get_variable("w", [kernel, kernel, kernel, i_units,
+                                               o_units],
+                        initializer=initializer_func()) # Note: 3d init not available. Think about this more.
+
+        for i in range(reflux):
+            conv_bias = tf.get_variable("b{}".format(i),
+                            initializer=tf.constant(0.1, shape=[o_units]))
+
+            pre = tf.nn.conv3d(input, conv_weights,
+                                    strides=[1, 1, 1, 1, 1], padding='SAME') + conv_bias
+	                            
+            if activate:
+                with tf.variable_scope(str(i)):
+                    input = prelu(pre)
+            else:
+                input = pre
+            
+        h_conv1 = input
+
+	if pool:
+	    pooled = tf.nn.max_pool3d(h_conv1,
+							ksize=[1, 2, 2, 2, 1],
+							strides=[1, 2, 2, 2, 1],
+							padding='SAME')
+	else:
+	    pooled = h_conv1
+
+	return pooled
+
 def fc_layer2(input, o_units, name, activate=True):
     batch_size = tf.shape(input)[0]
 
