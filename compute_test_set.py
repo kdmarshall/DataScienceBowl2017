@@ -6,16 +6,28 @@ import numpy as np
 
 from utils import *
 from ml_ops import *
+import models
 
 tf.app.flags.DEFINE_string("dataset", None, 'Path to dataset h5.')
 tf.app.flags.DEFINE_string("labels", None, 'Path to labels data set.')
-tf.app.flags.DEFINE_string("model", None, 'Directory path to save out model and tensorboard files.')
+tf.app.flags.DEFINE_string("ckpt", None, 'Directory path to saved checkpoint file.')
+tf.app.flags.DEFINE_string("model", None, 'Name of model to use.')
 
 # Globals
 FLAGS = tf.app.flags.FLAGS
 
-if FLAGS.model:
-    from models import recycled as model
+# if FLAGS.model:
+#     from models import recycled as model
+
+model = None
+models_func_list = dir(models)
+for model_func in models_func_list:
+  if model_func == FLAGS.model:
+    model = getattr(models, model_func)
+    print("Using model {}".format(model_func))
+
+if not model:
+  sys.exit("Cannot determine model name {}".format(FLAGS.model))
 
 # Using test sizes for now for faster debugging
 IMAGE_HEIGHT = 140
