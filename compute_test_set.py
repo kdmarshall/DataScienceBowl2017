@@ -59,7 +59,8 @@ def main(*args):
                                              
             feed_dict = {input_placeholder: data_batch}
             
-            logits = sess.run([logits], feed_dict=feed_dict)[0]
+            prediction = sess.run([logits], feed_dict=feed_dict)[0]
+            print(prediction)
 
 
 if __name__ == "__main__":
