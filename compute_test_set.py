@@ -15,7 +15,7 @@ tf.app.flags.DEFINE_string("model", None, 'Name of model to use.')
 
 # Globals
 FLAGS = tf.app.flags.FLAGS
-
+dir_path = os.path.dirname(os.path.realpath(__file__))
 # if FLAGS.model:
 #     from models import recycled as model
 
@@ -29,6 +29,8 @@ for model_func in models_func_list:
 if not model:
   sys.exit("Cannot determine model name {}".format(FLAGS.model))
 
+submission_file_path = os.path.join(dir_path,'submissions',FLAGS.model+'.csv')
+submission_file = open(submission_file_path,'w')
 # Using test sizes for now for faster debugging
 IMAGE_HEIGHT = 140
 IMAGE_WIDTH = 250
@@ -58,7 +60,7 @@ logits = tf.nn.sigmoid(_logits)
 def main(*args):
     with tf.Session() as sess:
         saver = tf.train.Saver()
-        
+        submission_file.write('id,cancer\n')
         for patiend_id, data_batch in dataset.inference_iteritems():
             
             data_batch = data_batch.reshape([-1,
@@ -70,6 +72,9 @@ def main(*args):
             feed_dict = {input_placeholder: data_batch}
             
             logits = sess.run([logits], feed_dict=feed_dict)[0]
+            sq_logits = np.squeeze(logits)
+            submission_file.write(patiend_id+","+str(sq_logits[0])+"\n")
+        submission_file.close()
 
 
 if __name__ == "__main__":
