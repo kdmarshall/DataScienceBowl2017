@@ -72,14 +72,14 @@ class Dataset(object):
         labels_df = pd.read_csv(labels_path, index_col='id')
         # We need to match patients with labels
         self.patients = {}
-        patients_not_found = []
+        self.patients_not_found = []
         for patient in patient_paths:
             patient_id = patient.split('/')[-1].split('.')[0]
             try:
                 label = labels_df.get_value(str(patient_id), 'cancer')
             except:
                 # print("Patient {} not found".format(patient_id))
-                patients_not_found.append(patient_id)
+                self.patients_not_found.append(patient_id)
                 continue
             self.patients[patient_id] = int(label)
         # print("Did not find {} out of {} total patients".format(len(patients_not_found),len(patient_paths)))
@@ -156,6 +156,15 @@ class Dataset(object):
             patients.append(patient)
             samples.append(sample_arr)
         return patients, np.array(labels).reshape([-1, 1]), np.stack(samples)
+
+    def inference_iteritems(self):
+        patients = self.patients_not_found
+        for patient in patients:
+            gz_file_path = os.path.join(self.sample_dir_path,patient + '.npy.gz')
+            gzipfile = gzip.GzipFile(gz_file_path, 'r')
+            sample_arr = np.load(gzipfile)
+            sample_arr = self.transform(sample_arr)
+            yield patient, np.array([sample_arr])
 
     def compute_statistics(self):
         
