@@ -31,7 +31,7 @@ IMAGE_HEIGHT = 140
 IMAGE_WIDTH = 250
 IMAGE_DEPTH = 325
 
-dataset = Dataset(FLAGS.dataset, FLAGS.labels, valid_split=VALID_SPLIT)
+dataset = Dataset(FLAGS.dataset, FLAGS.labels, valid_split=0.5)
 
 # TF Placeholders
 input_placeholder = tf.placeholder(tf.float32,[None,
