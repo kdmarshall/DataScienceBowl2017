@@ -16,9 +16,6 @@ tf.app.flags.DEFINE_string("model", None, 'Name of model to use.')
 # Globals
 FLAGS = tf.app.flags.FLAGS
 
-# if FLAGS.model:
-#     from models import recycled as model
-
 model = None
 models_func_list = dir(models)
 for model_func in models_func_list:
@@ -36,13 +33,6 @@ IMAGE_DEPTH = 325
 
 dataset = Dataset(FLAGS.dataset, FLAGS.labels, valid_split=VALID_SPLIT)
 
-#if FLAGS.model[-1] == '/':
-#    model_name = FLAGS.model[:-1].split('/')[-1]
-#    model_path = os.path.join(FLAGS.model, model_name+'.ckpt')
-#else:
-#    model_name = FLAGS.model.split('/')[-1]
-#    model_path = os.path.join(FLAGS.model, model_name+'.ckpt')
-
 # TF Placeholders
 input_placeholder = tf.placeholder(tf.float32,[None,
                                                IMAGE_HEIGHT,
@@ -57,7 +47,7 @@ def main(*args):
     with tf.Session() as sess:
         saver = tf.train.Saver()
         
-        saver.restore(sess, "/tmp/model.ckpt")
+        saver.restore(sess, FLAGS.ckpt)
         
         for patiend_id, data_batch in dataset.inference_iteritems():
             
