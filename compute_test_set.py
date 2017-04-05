@@ -16,8 +16,6 @@ tf.app.flags.DEFINE_string("model", None, 'Name of model to use.')
 # Globals
 FLAGS = tf.app.flags.FLAGS
 dir_path = os.path.dirname(os.path.realpath(__file__))
-# if FLAGS.model:
-#     from models import recycled as model
 
 model = None
 models_func_list = dir(models)
@@ -36,14 +34,7 @@ IMAGE_HEIGHT = 140
 IMAGE_WIDTH = 250
 IMAGE_DEPTH = 325
 
-dataset = Dataset(FLAGS.dataset, FLAGS.labels, valid_split=VALID_SPLIT)
-
-#if FLAGS.model[-1] == '/':
-#    model_name = FLAGS.model[:-1].split('/')[-1]
-#    model_path = os.path.join(FLAGS.model, model_name+'.ckpt')
-#else:
-#    model_name = FLAGS.model.split('/')[-1]
-#    model_path = os.path.join(FLAGS.model, model_name+'.ckpt')
+dataset = Dataset(FLAGS.dataset, FLAGS.labels, valid_split=0.5)
 
 # TF Placeholders
 input_placeholder = tf.placeholder(tf.float32,[None,
@@ -52,14 +43,14 @@ input_placeholder = tf.placeholder(tf.float32,[None,
                                                IMAGE_DEPTH,
                                                1])
 
-learning_rate = tf.Variable(INITIAL_LEARNING_RATE, trainable=False)
-
 _logits = model(input_placeholder)
 logits = tf.nn.sigmoid(_logits)
 
 def main(*args):
     with tf.Session() as sess:
         saver = tf.train.Saver()
+        saver.restore(sess, FLAGS.ckpt)
+
         submission_file.write('id,cancer\n')
         for patiend_id, data_batch in dataset.inference_iteritems():
             
@@ -70,7 +61,6 @@ def main(*args):
                                              1])
                                              
             feed_dict = {input_placeholder: data_batch}
-            
             logits = sess.run([logits], feed_dict=feed_dict)[0]
             sq_logits = np.squeeze(logits)
             submission_file.write(patiend_id+","+str(sq_logits[0])+"\n")
