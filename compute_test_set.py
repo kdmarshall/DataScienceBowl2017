@@ -6,7 +6,6 @@ import numpy as np
 
 from utils import *
 from ml_ops import *
-from models import recycled as model
 
 tf.app.flags.DEFINE_string("dataset", None, 'Path to dataset h5.')
 tf.app.flags.DEFINE_string("labels", None, 'Path to labels data set.')
@@ -15,13 +14,15 @@ tf.app.flags.DEFINE_string("model", None, 'Directory path to save out model and 
 # Globals
 FLAGS = tf.app.flags.FLAGS
 
+if FLAGS.model:
+    from models import recycled as model
+
 # Using test sizes for now for faster debugging
 IMAGE_HEIGHT = 140
 IMAGE_WIDTH = 250
 IMAGE_DEPTH = 325
 
 dataset = Dataset(FLAGS.dataset, FLAGS.labels, valid_split=VALID_SPLIT)
-
 
 #if FLAGS.model[-1] == '/':
 #    model_name = FLAGS.model[:-1].split('/')[-1]
@@ -45,9 +46,8 @@ logits = tf.nn.sigmoid(_logits)
 def main(*args):
     with tf.Session() as sess:
         saver = tf.train.Saver()
-
-        for step in range(NUM_STEPS):
-            ###patient, label_batch, data_batch = dataset.get_batch(batch_size=BATCH_SIZE)
+        
+        for patiend_id, data_batch in dataset.inference_iteritems():
             
             data_batch = data_batch.reshape([-1,
                                              IMAGE_HEIGHT,
