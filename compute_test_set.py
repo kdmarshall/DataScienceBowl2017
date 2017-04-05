@@ -63,7 +63,7 @@ def main(*args):
             feed_dict = {input_placeholder: data_batch}
             prediction = sess.run([logits], feed_dict=feed_dict)[0]
             sq_logits = np.squeeze(prediction)
-            submission_file.write(patiend_id+","+str(sq_logits[0])+"\n")
+            submission_file.write(patiend_id+","+str(sq_logits)+"\n")
         submission_file.close()
 
 
