@@ -38,14 +38,14 @@ input_placeholder = tf.placeholder(tf.float32,[None,
                                                IMAGE_DEPTH,
                                                1])
 
-learning_rate = tf.Variable(INITIAL_LEARNING_RATE, trainable=False)
-
 _logits = model(input_placeholder)
 logits = tf.nn.sigmoid(_logits)
 
 def main(*args):
     with tf.Session() as sess:
         saver = tf.train.Saver()
+        
+        saver.restore(sess, "/tmp/model.ckpt")
         
         for patiend_id, data_batch in dataset.inference_iteritems():
             
